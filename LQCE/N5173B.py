@@ -45,7 +45,8 @@ class N5173B_gen(instr.Instr):
         self.write(":OUTPut:MODulation {}".format(mod_state))
     def get_modulation_state(self):
         return (self.query(":OUTput:MOD?"))
-    
+    def set_pulse_out_state(self, state = "OFF"):
+        self.write(":PULM:STATe {}".format(state))
     def set_trigger_external_source(self, source):
         """TRIGger1 | TRIGger2 | PULSe"""
         self.write(":TRIGger:EXTernal:SOURce {}".format(source))
@@ -75,7 +76,7 @@ class N5173B_gen(instr.Instr):
         """default frequency a 1MHz"""
         self.write(":PULM:INTernal:FREQuency {}".format(freq))
     def set_pulse_train_ontime(self, time):
-        self.write(":PULM:INTernal:TRAin:ONTime {}".format(time))
+        self.write(":PULM:INTernal:TRAin:ONTime {:.1e}".format(time))
     def set_pulse_train_offtime(self, time):
         self.write(":PULM:INTernal:TRAin:OFFTime {}".format(time))
     def set_pulse_train_repetition(self, counts):

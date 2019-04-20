@@ -31,7 +31,7 @@ class awg33500(instr.Instr):
         self.write("SOURce{}:AM:INTernal:FREQuency {}".format(channel, freq))
     def set_waveform_type(self, channel, waveform_type = "PULSe"):
         """
-        SINusoid | SQUare | PULSe | RAMP | NRAMp | TRIangle | NOISe | PRBS | ARB
+        SINusoid | SQUare | PULSe | RAMP | NRAMp | TRIangle | NOISe | PRBS | ARB | DC
         """
         self.write("SOURce{}:FUNCtion {}".format(channel, waveform_type))
     def set_output(self, channel , state):
@@ -101,10 +101,10 @@ class awg33500(instr.Instr):
         self.write("SOURce{}:BURSt:INTernal:PERiod {}".format(channel, period))
     def set_burst_trigger_source(self, channel = 1, source = "IMMediate"):
         """IMMediate | EXTernal | TIMer | BUS"""
-        self.write("TRIGger{}:TRIGger:SOURce {}".format(channel, source))
+        self.write("TRIGger{}:SOURce {}".format(channel, source))
     def set_trigger_source(self, channel = 1, source = "IMMediate"):
         """IMMediate | EXTernal | TIMer | BUS"""
-        self.write("TRIGger{}:TRIGger:SOURce {}".format(channel, source))
+        self.write("TRIGger{}:SOURce {}".format(channel, source))
     def send_trigger(self):
         self.write("*TRG")
     def set_burst_phase(self, channel, phase):
@@ -113,7 +113,7 @@ class awg33500(instr.Instr):
         -360 to +360
         3.6 of angle corresponded to 0.01 of period
         """
-        self.write("SOURce{}:BURSt:PHASe".format(channel, phase))
+        self.write("SOURce{}:BURSt:PHASe {}".format(channel, phase))
     def synchronize_channels(self):
         self.write("SOURce1:PHASe:SYNChronize")
         self.write("SOURce2:PHASe:SYNChronize")
