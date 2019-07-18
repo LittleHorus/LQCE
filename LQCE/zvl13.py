@@ -95,17 +95,69 @@ class zvl13(instr.Instr):
         curves = [0]*data_frames_count
         out_data = []
         out_phase = []
+        out_data_re = []
+        out_data_im = []
         for i in range(data_frames_count):
             curves[i] = self.query("CALCulate1:DATA:NSWeep? SDATa, {}".format(i+1))
             np_d = np.fromstring(curves[i], sep = ',')
             temp_data = []*int(len(np_d)/2)
             temp_phase = []*int(len(np_d)/2)
+            temp_re = []*int(len(np_d)/2)
+            temp_im = []*int(len(np_d)/2)
+            
             for j in range(int(len(np_d)/2)):
                 temp_data.append(20*math.log(math.sqrt(np_d[2*j]**2+np_d[2*j+1]**2),10))
                 temp_phase.append(math.atan2(np_d[2*j+1],np_d[2*j]))
+                temp_re.append(np_d[2*j])
+                temp_im.append(np_d[2*j+1])
             out_data.append(temp_data)
             out_phase.append(temp_phase)
-        return (out_data, out_phase)
+            out_data_re.append(temp_re)
+            out_data_im.append(temp_im)
+        return (out_data, out_phase, out_data_re, out_data_im)
+    def get_formatted_data(self, data_frames_count = 1, format = 'ReIm'):
+        '''Supported formats: ReIm(default) | S21Phase'''
+        curves = [0]*data_frames_count
+        
+        if format == 'ReIm':
+            re = []
+            im = []
+            av_re = []
+            av_im = []
+            for i in range(data_frames_count):
+                curves[i] = self.query("CALCulate1:DATA:NSWeep? SDATa, {}".format(i+1))
+                np_data =  np.fromstring(curves[i], sep = ',')
+                temp_re = []*int(len(np_data)/2)
+                temp_im = []*int(len(np_data)/2)
+                for j in range(int(len(np_data)/2)):
+                    temp_re.append(np_data[2*j])
+                    temp_im.append(np_data[2*j+1])
+                re.append(temp_re)
+                im.append(temp_im)
+            av_re = np.average(re, 0)
+            av_im = np.average(im, 0)
+            return (av_re, av_im)
+        if format == 'S21Phase':
+            s21 = []
+            phase = []
+            av_s21 = []
+            av_phase = []
+            for i in range(data_frames_count):
+                curves[i] = self.query("CALCulate1:DATA:NSWeep? SDATa, {}".format(i+1))
+                np_data = np.fromstring(curves[i], sep = ',')
+                temp_s21 = []*int(len(np_data)/2)
+                temp_phase = []*int(len(np_data)/2)            
+                for j in range(int(len(np_data)/2)):
+                    temp_s21.append(20*math.log(math.sqrt(np_data[2*j]**2+np_data[2*j+1]**2),10))
+                    temp_phase.append(math.atan2(np_data[2*j+1],np_data[2*j])) 
+                s21.append(temp_s21)
+                phase.append(temp_phase)
+            if data_frames_count == 1:
+                return (s21,phase)
+            av_s21 = np.average(s21, 0)
+            av_phase = np.average(phase, 0)
+            return (av_s21, av_phase)
+        
     def set_data_mode(self, mode):
         """
         this func set the format of fetching data from analyzer

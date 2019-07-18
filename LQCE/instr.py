@@ -66,6 +66,8 @@ class Instr(object):
     def write(self, command):
         # print("Writing {0}".format(command))
         self._visainstrument.write(command)
+    def read_raw(self):
+        return self._visainstrument.read_raw()
     def close(self):
         #close session 
         self._visainstrument.close()

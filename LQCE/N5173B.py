@@ -2,7 +2,7 @@
 """
 Created on Tue Apr  2 13:37:29 2019
 
-@author: Betretzen
+@author: 
 """
 
 import LQCE.instr as instr
@@ -94,4 +94,40 @@ class N5173B_gen(instr.Instr):
     def set_pulse_mode(self, mode = "PTRain"):
         """SQUare | FRUN | TRIGgered | ADOublet | DOUBlet | GATEd | PTRain"""
         self.write(":PULM:SOURce:INTernal {}".format(mode))
-    
+    def gen_init_pulse_mode(self, freq, pulse_start_len):
+        self.set_output_state("OFF")
+        self.set_frequency(freq)
+        self.set_alc_state("OFF")
+        self.set_modulation_state("ON")
+        self.set_pulse_out_state("ON")
+        self.set_power(-5)
+        self.set_trigger_source("EXTernal")
+        self.set_trigger_external_source("PULSe")
+        self.set_pulse_mode("PTRain")
+        self.set_pulse_train_ontime(pulse_start_len)
+        self.set_pulse_train_offtime(20e-9)
+        self.set_pulse_train_repetition(1)
+        self.set_pulse_train_trigger("TRIGgered")
+        self.set_pulse_internal_step_delay(10e-9)
+        self.set_pulse_internal_delay(0)
+        self.set_output_state("ON")
+    def gen_init_ramsey_mode(self, freq, pulse_start_len, delay = 10e-9):
+        self.set_output_state("OFF")
+        self.set_frequency(freq)
+        self.set_alc_state("OFF")
+        self.set_modulation_state("ON")
+        self.set_pulse_out_state("ON")
+        self.set_power(-15)
+        self.set_trigger_source("EXTernal")
+        self.set_trigger_external_source("PULSe")
+        self.set_pulse_mode("PTRain")
+        #self.set_pulse_train_ontime(pulse_start_len)
+        #self.set_pulse_train_offtime(20e-9 + delay, 20e-9)
+        #self.set_pulse_train_repetition(1)
+        self.write(":PULM:INTernal:TRAin:ONTime {},{}".format(pulse_start_len, pulse_start_len)) #:PULM:INTernal:TRAin:ONTime <value>,<value>
+        self.write(":PULM:INTernal:TRAin:OFFTime {},{}".format(10e-9 + delay, 20e-9)) #:PULM:INTernal:TRAin:OFFTime <value>,<value>
+        self.write(":PULM:INTernal:TRAin:REPetition {},{}".format(1,1)) #:PULM:INTernal:TRAin:REPetition <value>,<value>
+        self.set_pulse_train_trigger("TRIGgered")
+        self.set_pulse_internal_step_delay(10e-9)
+        self.set_pulse_internal_delay(0)
+        self.set_output_state("ON")   

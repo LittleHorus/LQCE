@@ -2,7 +2,7 @@
 """
 Created on Mon Apr  1 10:01:21 2019
 
-@author: Argel Tal
+@author: Dmitry
 """
 import serial
 from ctypes import (Union, Array, c_uint8, c_float, cdll, CDLL)
@@ -18,26 +18,45 @@ class f_type(Union):
 
 
 class Nsk_current_source(object):
-    """
-    current source as serial device only
-    
-    """
+
     def __init__(self, com_name):
         self.com_name = com_name
-        self.serial_device = serial.Serial(port = com_name, baudrate = 115200, timeout = None)
+        self.session_open = 0
+        self.serial_device = serial.Serial()
+        self.serial_device.port = com_name
+        self.serial_device.baudrate = 115200
+        self.serial_device.timeout = 5
+        
+        '''
+        try:
+            self.serial_device = serial.Serial(port = com_name, baudrate = 115200, timeout = 5)
+            self.session_open = 1
+        except  serial.SerialException:
+                print("COM port already initialize")
+                
+        ''' 
         self.datain_buf = []
         self.dataout_buf = []
         self.active_channel = 1
+        
 
     def close(self):
         self.serial_device.close()
+        self.session_open = 0
     def open(self):
-        self.serial_device.open()
+        if self.session_open == 0:
+            try:
+                self.serial_device.open()
+                self.session_open = 1
+            except serial.SerialException:
+                print("com port not open")
+        else:
+            print("device already initialize")
     def write(self, data_bytearray):
         self.serial_device.write(data_bytearray)
     def read(self, bytes_num):
         return (self.serial_device.read(bytes_num))
-           
+		
     def crc8(self, data_in):
         """
         this function evaluate crc
@@ -168,7 +187,7 @@ class Nsk_current_source(object):
         self.write(ftemp)
         return(self.read(10))
     def set_voltage_compliance(self, ch_num = 1, voltage_compliance_value = 10):
-        """ no realized, need hardware fix to implementation"""
+        """ no hardware support"""
         pass
     def get_voltage_compliance(self):
         temp_cmd = [0xC1, 0xB0, 0xBF, 0xBF, 0xBF, 0xBF, 0xBF, 0xBF, 0xBF]
