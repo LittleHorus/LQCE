@@ -5,7 +5,6 @@ Created on Mon Jul 15 13:37:39 2019
 @author: Dmitry
 """
 #import LQCE.instr as instr
-import numpy as np
 import re
 import visa
 from pyvisa.resources import MessageBasedResource
@@ -70,7 +69,7 @@ class Lecroy():
     def set_msize(self, samples):
         self.write("MSIZ {}".format(samples))
     def get_msize(self):
-        mstring = self.query("MSIZE?")
+        mstring = self.query("MSIZ?")
         msub = mstring.split('MSIZ ')
         m = msub[1].split(' SAMPLE\n')
         return int(float(m[0]))
@@ -88,7 +87,7 @@ class Lecroy():
         return self.query("TRCP?")    
     def set_trigger_level(self, tlevel):
         self.trigger_level = tlevel
-        self.rite("TRLV {}".format(tlevel))
+        self.write("TRLV {}".format(tlevel))
     def get_trigger_level(self):
         tstring = self.query("TRLV?")
         tsub = tstring.split('EX:TRLV ')
